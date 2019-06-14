@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "constate": "^1.1.1",
+    "customize-cra": "^0.2.13",
+    "lodash": "^4.17.11",
     "react": "^16.8.6",
+    "react-app-rewired": "^2.1.3",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },
@@ -11,7 +15,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -27,5 +33,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@storybook/addon-actions": "^5.1.7",
+    "@storybook/addon-info": "^5.1.7",
+    "@storybook/addon-knobs": "^5.1.7",
+    "@storybook/addon-links": "^5.1.7",
+    "@storybook/addon-storysource": "^5.1.7",
+    "@storybook/addons": "^5.1.7",
+    "@storybook/react": "^5.1.7",
+    "babel-loader": "^8.0.6",
+    "node-sass": "^4.12.0",
+    "storybook-readme": "^5.0.3"
   }
 }
