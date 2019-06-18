@@ -1,10 +1,11 @@
 import axios from 'axios';
-import _ from 'lodash';
+import isPlainObject from 'lodash/isPlainObject';
+import omit from 'lodash/omit';
 
 const isUseBodyMethod = method => ['post', 'put', 'patch'].indexOf(method) >= 0;
 
 const objectToUrlSearchParams = obj => {
-  if (!_.isPlainObject(obj)) return null;
+  if (!isPlainObject(obj)) return null;
   const params = new URLSearchParams();
   const keys = Object.keys(obj);
   keys.forEach(key => {
@@ -23,7 +24,7 @@ const objectToUrlSearchParams = obj => {
 const paramRegExp = /:([^/]*?)(?=\/|$)/g;
 
 const processParameterizedUrl = (url, data) => {
-  if (!_.isString(url) || url.trim() === '') {
+  if (typeof url !== 'string' || url.trim() === '') {
     return { url: '', keys: [] };
   }
 
@@ -106,7 +107,7 @@ class ApiClient {
       url,
       data
     );
-    data = _.omit(data, usedKeys);
+    data = omit(data, usedKeys);
     if (useSearchParams) {
       data = objectToUrlSearchParams(data);
     }

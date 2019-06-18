@@ -1,0 +1,126 @@
+@import '../styles/index.scss';
+
+@mixin make-row($gutter: $grid-gutter-width) {
+  position: relative;
+  display: flex;
+  height: auto;
+  margin-left: -$gutter / 2;
+  margin-right: -$gutter / 2;
+  flex-flow: row wrap;
+  box-sizing: border-box;
+}
+
+@mixin make-columns($column-count: $grid-columns, $breakpoints-classes: $breakpoints) {
+  $list: ();
+  @for $index from 1 through $column-count {
+    $list: append($list, '.#{$prefix}-col-#{$index}', comma);
+    @each $cl in $breakpoints-classes {
+      $list: append($list, '.#{$prefix}-col-#{$cl}-#{$index}', comma);
+    }
+  }
+
+  #{$list} {
+    position: relative;
+    box-sizing: border-box;
+    display: block;
+    padding-left: $grid-gutter-width / 2;
+    padding-right: $grid-gutter-width / 2;
+    flex: 0 0 auto;
+  }
+}
+
+@mixin make-grid-columns($breakpoint: null) {
+  $breakpoint-str: if($breakpoint, '-#{$breakpoint}', '');
+  
+  .#{$prefix}-col#{$breakpoint-str}-order-0 {
+    order: 0
+  };
+
+  @for $index from 1 through $grid-columns {
+    .#{$prefix}-col#{$breakpoint-str}-#{$index} {
+      width: percentage($index / $grid-columns);
+    }
+
+    .#{$prefix}-col#{$breakpoint-str}-pull-#{$index} {
+      right: percentage($index / $grid-columns);
+    }
+
+    .#{$prefix}-col#{$breakpoint-str}-push-#{$index} {
+      left: percentage($index / $grid-columns);
+    }
+
+    .#{$prefix}-col#{$breakpoint-str}-offset-#{$index} {
+      margin-left: percentage($index / $grid-columns);
+    }
+
+    .#{$prefix}-col#{$breakpoint-str}-order-#{$index} {
+      order: $index;
+    }
+  }
+}
+
+.#{$prefix}-row {
+  @include make-row();
+}
+
+.#{$prefix}-row-justify-start {
+  justify-content: flex-start;
+}
+
+.#{$prefix}-row-justify-center {
+  justify-content: center;
+}
+
+.#{$prefix}-row-justify-end {
+  justify-content: end;
+}
+
+.#{$prefix}-row-justify-space-around {
+  justify-content: space-around;
+}
+
+.#{$prefix}-row-justify-space-between {
+  justify-content: space-between;
+}
+
+.#{$prefix}-row-align-start {
+  align-items: flex-start;
+}
+
+.#{$prefix}-row-align-center {
+  align-items: center;
+}
+
+.#{$prefix}-row-align-end {
+  align-items: flex-end;
+}
+
+.#{$prefix}-col {
+  position: relative;
+}
+
+@include make-columns();
+
+@include make-grid-columns();
+
+@include make-grid-columns('xs');
+
+@media screen and (min-width: $screen-sm-min) {
+  @include make-grid-columns('sm');
+}
+
+@media screen and (min-width: $screen-md-min) {
+  @include make-grid-columns('md');
+}
+
+@media screen and (min-width: $screen-lg-min) {
+  @include make-grid-columns('lg');
+}
+
+@media screen and (min-width: $screen-xl-min) {
+  @include make-grid-columns('xl');
+}
+
+@media screen and (min-width: $screen-xxl-min) {
+  @include make-grid-columns('xxl');
+}
