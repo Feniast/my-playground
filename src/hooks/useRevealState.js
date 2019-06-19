@@ -19,6 +19,36 @@ const getElementPos = (elem, container) => {
   };
 };
 
+const getElementsRevealState = (elements, container = window) => {
+  if (!elements) return {};
+  const isSingle = !Array.isArray(elements);
+  if (isSingle) {
+    elements = [elements];
+  }
+  const isWindow = container === window;
+  const root = isWindow ? document.documentElement : container;
+  const cx = !isWindow ? container.scrollLeft : window.pageXOffset;
+  const cy = !isWindow ? container.scrollTop : window.pageYOffset;
+  const { clientWidth: cw, clientHeight: ch } = root;
+
+  const results =  elements.map(element => {
+    const { el, threshold } = element;
+    const { x, y } = getElementPos(el, root);
+    const { width: w, height: h } = el.getBoundingClientRect();
+    const visibleX = (clamp(x + w, cx, cx + cw) - clamp(x, cx, cx + cw)) / w;
+    const visibleY = (clamp(y + h, cy, cy + ch) - clamp(y, cy, cy + ch)) / h;
+    const visible = visibleX * visibleY > (threshold || 0);
+
+    return {
+      visible,
+      visibleX,
+      visibleY
+    };
+  });
+
+  return isSingle ? results[0] : results;
+}
+
 class ScrollHub {
   constructor() {
     this.store = new Map();
@@ -70,34 +100,11 @@ class ScrollHub {
     if (!Array.isArray(elements)) {
       elements = [elements];
     }
-    const isWindow = container === window;
-    const root = isWindow ? document.documentElement : container;
-    const cx = !isWindow ? container.scrollLeft : window.pageXOffset;
-    const cy = !isWindow ? container.scrollTop : window.pageYOffset;
-    const { clientWidth: cw, clientHeight: ch } = root;
-    elements.forEach(element => {
-      const { el, onScroll, state = {}, threshold } = element;
-      const { x, y } = getElementPos(el, root);
-      const { width: w, height: h } = el.getBoundingClientRect();
-      const visibleX = (clamp(x + w, cx, cx + cw) - clamp(x, cx, cx + cw)) / w;
-      const visibleY = (clamp(y + h, cy, cy + ch) - clamp(y, cy, cy + ch)) / h;
-      const newVisible = visibleX * visibleY > (threshold || 0);
-      let newState;
-      if (typeof state.visible === 'undefined') {
-        newState = {
-          prevVisible: newVisible,
-          visible: newVisible,
-          visibleX,
-          visibleY
-        };
-      } else {
-        newState = {
-          prevVisible: state.visible,
-          visible: newVisible,
-          visibleX,
-          visibleY
-        };
-      }
+    const revealStates = getElementsRevealState(elements, container);
+    elements.forEach((element, idx) => {
+      const { onScroll, state = {} } = element;
+      const newState = revealStates[idx];
+      newState.prevVisible = typeof state.visible === 'undefined' ? newState.visible : state.visible;
       element.state = newState;
       onScroll(newState);
     });
@@ -106,7 +113,7 @@ class ScrollHub {
 
 const scrollHub = new ScrollHub();
 
-const useScrollState = (
+const useRevealState = (
   ref,
   { threshold = 0, container = window, unwatchOnVisible = false } = {}
 ) => {
@@ -135,4 +142,4 @@ const useScrollState = (
   return state;
 };
 
-export default useScrollState;
+export default useRevealState;
