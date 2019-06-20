@@ -22,7 +22,7 @@ const RevealedComponent = props => {
     });
   }, []);
   React.useEffect(() => {
-    if (scrollState.visible) {
+    if (scrollState.visible && !scrollState.prevVisible) {
       TweenMax.to(textRef.current, 1, {
         opacity: 1,
         y: '0%',
