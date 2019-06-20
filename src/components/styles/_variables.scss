@@ -1,6 +1,9 @@
-$prefix: "mp";
+@import './functions';
 
-$breakpoints: "xs", "sm", "md", "lg", "xl", "xxl";
+$prefix: 'mp';
+
+// breakpoints
+$breakpoints: 'xs', 'sm', 'md', 'lg', 'xl', 'xxl';
 
 $screen-xs: 480px;
 $screen-xs-min: $screen-xs;
@@ -21,5 +24,84 @@ $screen-md-max: $screen-lg-min - 1px;
 $screen-lg-max: $screen-xl-min - 1px;
 $screen-xl-max: $screen-xxl-min - 1px;
 
+// grid
 $grid-columns: 24;
 $grid-gutter-width: 0;
+
+// colors
+$white: #fff;
+$black: #000;
+$base-colors: (
+  red: #f44336,
+  pink: #e91e63,
+  purple: #9c27b0,
+  deep-purple: #673ab7,
+  indigo: #3f51b5,
+  blue: #2196f3,
+  light-blue: #03a9f4,
+  cyan: #00bcd4,
+  teal: #009688,
+  green: #4caf50,
+  light-green: #8bc34a,
+  lime: #cddc39,
+  yellow: #ffeb3b,
+  amber: #ffc107,
+  orange: #ff9800,
+  deep-orange: #ff5722,
+  brown: #795548,
+  grey: #9e9e9e,
+  blue-grey: #607d8b
+);
+
+$color-map: make-color-palette($base-colors);
+
+@function color-palette($color-name) {
+  @if map-has-key($color-map, $color-name) {
+    @return map-get($color-map, $color-name);
+  } @else {
+    @return $white;
+  }
+}
+
+$text-color: lighten($black, 20);
+$text-color-secondary: lighten($black, 40);
+$text-color-inverse: $white;
+
+$success-color: color-palette(green-5);
+$error-color: color-palette(red-5);
+$warning-color: color-palette(yellow-5);
+$info-color: color-palette(blue-5);
+
+$heading-color: lighten($black, 10);
+
+// font-size
+$text-size-base: 16px;
+$text-scale-ratio: 1.2;
+$text-xs: round($text-size-base / $text-scale-ratio / $text-scale-ratio);
+$text-sm: round($text-size-base / $text-scale-ratio);
+$text-base: $text-size-base;
+$text-md: round($text-size-base * $text-scale-ratio);
+$text-lg: round($text-size-base * $text-scale-ratio * $text-scale-ratio);
+$text-xl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+$text-xxl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+$text-xxxl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+
+$line-height-base: 1.5;
+
+// spacing
+$space-unit: 16px;
+$space-xxxxs: 0.125 * $space-unit;
+$space-xxxs: 0.25 * $space-unit;
+$space-xxs: 0.375 * $space-unit;
+$space-xs: 0.5 * $space-unit;
+$space-sm: 0.75 * $space-unit;
+$space-base: 1 * $space-unit;
+$space-md: 1.25 * $space-unit;
+$space-lg: 2 * $space-unit;
+$space-xl: 3.25 * $space-unit;
+$space-xxl: 5.25 * $space-unit;
+$space-xxxl: 8.5 * $space-unit;
+$space-xxxxl: 13.75 * $space-unit;
+
+// border-radius
+$border-radius-base: 4px;

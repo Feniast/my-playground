@@ -1,0 +1,53 @@
+@import '../styles/index.scss';
+
+$alert-message-color: $heading-color;
+$alert-description-color: $text-color;
+$alert-message-font-size: $text-sm;
+
+.#{$prefix}-alert {
+  align-items: flex-start;
+  position: relative;
+  padding: $space-xs $space-base $space-xs $space-lg;
+  font-size: $alert-message-font-size;
+  line-height: $line-height-base;
+  color: $text-color;
+  border-radius: $border-radius-base;
+
+  &, & > * {
+    outline: 1px dashed red;
+
+  }
+
+  $self: #{&};
+
+  &-no-icon#{$self} {
+    padding: $space-xs $space-base;
+  }
+
+  &-closable#{$self} {
+    padding-right: $space-lg; 
+  }
+
+  &-with-description {
+    padding: $space-base $space-base $space-base $space-xl;
+  }
+
+  &-with-description &-message {
+    display: block;
+    margin-bottom: $space-xxs;
+    color: $alert-message-color;
+    font-size: $text-base;
+  }
+
+  &-icon {
+    position: absolute;
+    top: $space-xs + $alert-message-font-size * $line-height-base / 2 - $alert-message-font-size / 2;
+    left: $space-sm;
+  }
+
+  &-with-description &-icon {
+    top: $space-base;
+    left: $space-md;
+    font-size: 24px;
+  }
+}

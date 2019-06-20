@@ -1,0 +1,24 @@
+@function make-color-palette($color-map, $variations: 10) {
+  $colors: ();
+  $max-variation: 36;
+  $mid: $variations / 2;
+  $dist: $mid - 1;
+  $step: $max-variation / $dist;
+
+  @each $color, $value in $color-map {
+    @for $i from 1 through $dist {
+      $variation-percentage: $max-variation - $step * ($i - 1);
+      $colors: map-merge($colors, (
+        #{$color}-#{$i}: lighten($value, $variation-percentage),
+        #{$color}-#{$variations - $i}: darken($value, $variation-percentage)
+      ))
+    }
+
+    $colors: map-merge($colors, (
+      #{$color}-#{$mid}: $value,
+      #{$color}-0: lighten($value, 38.7)
+    ))
+  }
+
+  @return $colors;
+}
