@@ -1,40 +1,45 @@
-@import '../styles/index.scss';
+@import '../../styles/index.scss';
 
-.#{prefix}-loader {
-  position: relative;
+@mixin dimensions ($w, $h: $w, $center: true) {
+  width: $w;
+  height: $h;
+  @if ($center) {
+    margin-top: -$h / 2;
+    margin-left: -$w / 2;
+  }
 }
 
-.#{prefix}-loader-ring {
-  border: 3px solid transparent;
-  border-top-color: #3cefff;
-  border-right-color: #3cefff;
+.#{$prefix}-loader {
+  position: relative;
+  @include dimensions(2.6em, 2.6em, false);
+}
+
+.#{$prefix}-loader-ring {
+  border: 4px solid transparent;
+  border-top-color: $loading-color;
+  border-right-color: $loading-color;
   border-radius: 50%;
+  animation: spin 2s linear infinite;
   position: absolute;
-  top: 50%;
   left: 50%;
+  top: 50%;
 
   &:first-child {
-    width: 3.5em;
-    height: 3.5em;
-    margin-left: -1.75em;
-    margin-top: -1.75em;
-    animation: spin 2s linear infinite;
+    @include dimensions(2.6em);
+  }
+
+  &:nth-child(2n) {
+    animation-direction: reverse;
   }
 
   &:nth-child(2) {
-    width: 2.1em;
-    height: 2.1em;
-    margin-left: -1.05em;
-    margin-top: -1.05em;
-    animation: spin 1.75s linear reverse infinite;
+    @include dimensions(1.8em);
+    animation-duration: 1.75s;
   }
 
   &:nth-child(3) {
-    width: 0.8em;
-    height: 0.8em;
-    margin-left: -0.4em;
-    margin-top: -0.4em;
-    animation: spin 1.5s linear infinite;
+    @include dimensions(1em);
+    animation-duration: 1.5s;
   }
 }
 
