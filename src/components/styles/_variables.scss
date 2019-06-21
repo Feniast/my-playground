@@ -1,4 +1,5 @@
 @import './functions';
+@import './colors';
 
 $prefix: 'mp';
 
@@ -29,64 +30,41 @@ $grid-columns: 24;
 $grid-gutter-width: 0;
 
 // colors
-$white: #fff;
-$black: #000;
-$base-colors: (
-  red: #f44336,
-  pink: #e91e63,
-  purple: #9c27b0,
-  deep-purple: #673ab7,
-  indigo: #3f51b5,
-  blue: #2196f3,
-  light-blue: #03a9f4,
-  cyan: #00bcd4,
-  teal: #009688,
-  green: #4caf50,
-  light-green: #8bc34a,
-  lime: #cddc39,
-  yellow: #ffeb3b,
-  amber: #ffc107,
-  orange: #ff9800,
-  deep-orange: #ff5722,
-  brown: #795548,
-  grey: #9e9e9e,
-  blue-grey: #607d8b
-);
+$text-color: rgba($black, 0.65);
+$text-color-accent: rgba($black, 0.87);
+$text-color-secondary: rgba($black, 0.54);
+$text-color-disabled: rgba($black, 0.38);
 
-$color-map: make-color-palette($base-colors);
+$text-color-light: $white;
+$text-color-light-secondary: rgba($white, 0.7);
+$text-color-light-disabled: rgba($white, 0.5);
 
-@function color-palette($color-name) {
-  @if map-has-key($color-map, $color-name) {
-    @return map-get($color-map, $color-name);
-  } @else {
-    @return $white;
-  }
-}
+$success-color: color-palette(green, 600);
+$success-color-secondary: color-palette(green, 300);
+$success-color-fade: color-palette(green, 50);
+$error-color: color-palette(red, 600);
+$error-color-secondary: color-palette(red, 300);
+$error-color-fade: color-palette(red, 50);
+$warning-color: color-palette(yellow, 800);
+$warning-color-secondary: color-palette(yellow, 500);
+$warning-color-fade: color-palette(yellow, 50);
+$info-color: color-palette(blue, 600);
+$info-color-secondary: color-palette(blue, 300);
+$info-color-fade: color-palette(blue, 50);
 
-$text-color: lighten($black, 20);
-$text-color-secondary: lighten($black, 40);
-$text-color-inverse: $white;
-
-$success-color: color-palette(green-5);
-$error-color: color-palette(red-5);
-$warning-color: color-palette(yellow-5);
-$info-color: color-palette(blue-5);
-
-$heading-color: lighten($black, 10);
-
-$loading-color: color-palette(light-blue-4);
+$loading-color: color-palette(light-blue, 400);
 
 // font-size
 $text-size-base: 16px;
 $text-scale-ratio: 1.2;
-$text-xs: round($text-size-base / $text-scale-ratio / $text-scale-ratio);
-$text-sm: round($text-size-base / $text-scale-ratio);
+$text-xs: ceil($text-size-base / $text-scale-ratio / $text-scale-ratio);
+$text-sm: ceil($text-size-base / $text-scale-ratio);
 $text-base: $text-size-base;
-$text-md: round($text-size-base * $text-scale-ratio);
-$text-lg: round($text-size-base * $text-scale-ratio * $text-scale-ratio);
-$text-xl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
-$text-xxl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
-$text-xxxl: round($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+$text-md: ceil($text-size-base * $text-scale-ratio);
+$text-lg: ceil($text-size-base * $text-scale-ratio * $text-scale-ratio);
+$text-xl: ceil($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+$text-xxl: ceil($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
+$text-xxxl: ceil($text-size-base * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio * $text-scale-ratio);
 
 $line-height-base: 1.5;
 

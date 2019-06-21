@@ -31,10 +31,15 @@ class Alert extends React.PureComponent {
     closed: false
   };
 
-  handleClose = () => {
+  handleClose = (e) => {
+    e.preventDefault();
+    const { onClose } = this.props;
     this.setState({
       closed: true
     });
+    if (typeof onClose === 'function') {
+      onClose();
+    }
   };
 
   render() {
@@ -68,10 +73,9 @@ class Alert extends React.PureComponent {
 
     let iconEl = null;
     const iconClassName = `${classPrefix}-icon`;
-    const iconSize = !!description ? 24 : 14;
     if (showIcon) {
       if (typeof icon === 'string') {
-        iconEl = <Icon type={icon} className={iconClassName} size={iconSize} />;
+        iconEl = <Icon type={icon} className={iconClassName} />;
       } else if (React.isValidElement(icon)) {
         iconEl = React.cloneElement(icon, {
           className: classnames(iconClassName, icon.props.className)
@@ -81,7 +85,7 @@ class Alert extends React.PureComponent {
         if (type === 'warning') iconType = 'alert-triangle';
         if (type === 'success') iconType = 'check-circle';
         if (type === 'error') iconType = 'x-circle';
-        iconEl = <Icon type={iconType} className={iconClassName} size={iconSize} />;
+        iconEl = <Icon type={iconType} className={iconClassName} />;
       }
     }
 

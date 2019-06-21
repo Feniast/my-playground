@@ -1,27 +1,33 @@
 @import '../styles/index.scss';
 
-$alert-message-color: $heading-color;
+$alert-message-color: $text-color-accent;
 $alert-description-color: $text-color;
 $alert-message-font-size: $text-sm;
+$alert-message-font-size-lg: $text-base;
+$alert-message-descr-spacing: $space-xxs;
+$alert-description-font-size: $text-sm;
 
 .#{$prefix}-alert {
   align-items: flex-start;
   position: relative;
-  padding: $space-xs $space-base $space-xs $space-lg;
+  padding-top: $space-xs;
+  padding-bottom: $space-xs;
+  padding-left: $space-lg;
+  padding-right: $space-base;
   font-size: $alert-message-font-size;
   line-height: $line-height-base;
   color: $text-color;
   border-radius: $border-radius-base;
 
-  &, & > * {
-    outline: 1px dashed red;
+  // &, & > * {
+  //   outline: 1px dashed red;
 
-  }
+  // }
 
   $self: #{&};
 
   &-no-icon#{$self} {
-    padding: $space-xs $space-base;
+    padding-left: $space-base;
   }
 
   &-closable#{$self} {
@@ -29,14 +35,45 @@ $alert-message-font-size: $text-sm;
   }
 
   &-with-description {
-    padding: $space-base $space-base $space-base $space-xl;
+    padding-top: $space-base;
+    padding-bottom: $space-base;
+    padding-left: $space-xl;
   }
 
-  &-with-description &-message {
-    display: block;
-    margin-bottom: $space-xxs;
-    color: $alert-message-color;
-    font-size: $text-base;
+  &-success {
+    background-color: $success-color-fade;
+    border: 1px solid $success-color-secondary;
+
+    #{$self}-icon {
+      color: $success-color;
+    }
+  }
+
+  &-error {
+    background-color: $error-color-fade;
+    border: 1px solid $error-color-secondary;
+
+    #{$self}-icon {
+      color: $error-color;
+    }
+  }
+
+  &-warning {
+    background-color: $warning-color-fade;
+    border: 1px solid $warning-color-secondary;
+
+    #{$self}-icon {
+      color: $warning-color;
+    }
+  }
+
+  &-info {
+    background-color: $info-color-fade;
+    border: 1px solid $info-color-secondary;
+
+    #{$self}-icon {
+      color: $info-color;
+    }
   }
 
   &-icon {
@@ -45,9 +82,46 @@ $alert-message-font-size: $text-sm;
     left: $space-sm;
   }
 
+  &-close-icon {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: $space-xs;
+    right: $space-base;
+    cursor: pointer;
+  }
+
+  &-description {
+    display: none;
+    color: $alert-description-color;
+  }
+
   &-with-description &-icon {
+    font-size: $text-lg;
     top: $space-base;
     left: $space-md;
-    font-size: 24px;
   }
+
+  &-with-description &-message {
+    display: block;
+    margin-bottom: $alert-message-descr-spacing;
+    color: $alert-message-color;
+    font-size: $alert-message-font-size-lg;
+  }
+
+  &-with-description &-description {
+    display: block;
+    font-size: $alert-description-font-size;
+  }
+
+  &-with-description &-close-icon {
+    font-size: $text-md;
+    top: $space-base;
+    right: $space-base;
+    line-height: $text-sm * $line-height-base;
+  }
+  
 }
