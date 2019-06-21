@@ -85,3 +85,6 @@ $space-xxxxl: 13.75 * $space-unit;
 
 // border-radius
 $border-radius-base: 4px;
+
+// easing
+$ease-in-out-circ: cubic-bezier(0.78, 0.14, 0.15, 0.86);

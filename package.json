@@ -13,6 +13,7 @@
     "react-dom": "^16.8.6",
     "react-feather": "^1.1.6",
     "react-scripts": "3.0.1",
+    "react-transition-group": "^4.1.1",
     "splitting": "^1.0.6",
     "styled-components": "^4.3.2"
   },

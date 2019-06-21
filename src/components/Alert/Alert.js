@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { CSSTransition } from 'react-transition-group';
 import Icon from '../Icon';
 
 import './styles.scss';
@@ -13,6 +14,7 @@ class Alert extends React.PureComponent {
     closable: PropTypes.bool,
     closeText: PropTypes.node,
     onClose: PropTypes.func,
+    afterClose: PropTypes.func,
     prefixClass: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,
@@ -41,6 +43,13 @@ class Alert extends React.PureComponent {
       onClose();
     }
   };
+
+  onClosed = () => {
+    const { afterClose } = this.props;
+    if (typeof afterClose === 'function') {
+      afterClose();
+    }
+  }
 
   render() {
     const {
@@ -98,7 +107,15 @@ class Alert extends React.PureComponent {
       </button>
     ) : null;
 
-    return closed ? null : (
+    return (
+      <CSSTransition
+        in={!closed}
+        timeout={300}
+        classNames={classPrefix}
+        unmountOnExit
+        enter={false}
+        onExited={this.onClosed}
+      >
       <div className={classNames} style={style}>
         {showIcon ? iconEl : null}
         <div className={`${classPrefix}-content`}>
@@ -107,6 +124,7 @@ class Alert extends React.PureComponent {
         </div>
         {closeEl}
       </div>
+      </CSSTransition>
     );
   }
 }

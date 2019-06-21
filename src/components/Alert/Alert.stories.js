@@ -108,6 +108,8 @@ storiesOf('Alert', module)
           type="success"
           message="Success"
           closable={true}
+          onClose={() => console.log('on close')}
+          afterClose={() => console.log('after close')}
         />
         <Alert
           type="info"

@@ -124,4 +124,16 @@ $alert-description-font-size: $text-sm;
     line-height: $text-sm * $line-height-base;
   }
   
+  &-exit-active {
+    transform-origin: 0% 0%;
+    animation: hide 0.3s $ease-in-out-circ;
+    animation-fill-mode: both;
+  }
+}
+
+@keyframes hide {
+  to {
+    transform: scaleY(0);
+    opacity: 0;
+  }
 }
