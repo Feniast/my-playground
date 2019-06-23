@@ -1,24 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import useMedia from './useMedia';
 
 const useMediaEffect = (query, effect, guards = []) => {
-  const [matched, setMatched] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const listen = event => {
-      setMatched(event.matches);
-    };
-    mql.addListener(listen);
-    setMatched(mql.matches);
-
-    return () => {
-      mql.removeListener(listen);
-    }
-  }, [query]);
+  const matched = useMedia(query);
   const effectGuards = [matched, effect, ...guards];
   useEffect(() => {
     if (matched) return effect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, effectGuards);
+  return matched;
 }
 
 export default useMediaEffect;

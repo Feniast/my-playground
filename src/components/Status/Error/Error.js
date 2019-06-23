@@ -1,24 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert } from 'antd';
+import Alert from '../../Alert';
+import classnames from 'classnames';
 import Button from '../ControlButton';
-import isString from 'lodash/isString';
-import isFunction from 'lodash/isFunction';
 
-import './styles/error.scss';
+import './styles.scss';
 
-// Antd version
 const ErrorComp = React.memo(props => {
-  const { title, description, ctaText, onCtaClick, onClose } = props;
+  const { title, description, ctaText, onCtaClick, onClose, prefixClass, className } = props;
+  const classPrefix = `${prefixClass}-error`;
   let descriptionText = description || null;
   if (descriptionText) {
-    descriptionText = isString(descriptionText) ? (
-      <p className="va-error-desc">{descriptionText}</p>
+    descriptionText = typeof descriptionText === 'string' ? (
+      <p className={`${classPrefix}-desc`}>{descriptionText}</p>
     ) : (
       descriptionText
     );
   }
-  const closable = isFunction(onClose);
+  const closable = typeof onClose === 'function';
+  const classNames = classnames(classPrefix, className);
   const showDescription = descriptionText || (ctaText && onCtaClick);
   const errorBody = showDescription ? (
     <React.Fragment>
@@ -32,6 +32,7 @@ const ErrorComp = React.memo(props => {
   ) : null;
   return (
     <Alert
+      className={classNames}
       message={title}
       description={errorBody}
       type="error"
@@ -43,15 +44,17 @@ const ErrorComp = React.memo(props => {
 });
 
 ErrorComp.propTypes = {
+  prefixClass: PropTypes.string,
+  className: PropTypes.string,
   title: PropTypes.string.isRequired,
-  description: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-    PropTypes.node
-  ]),
+  description: PropTypes.oneOfType(PropTypes.node),
   ctaText: PropTypes.string,
   onCtaClick: PropTypes.func,
   onClose: PropTypes.func
+};
+
+ErrorComp.defaultProps = {
+  prefixClass: 'mp'
 };
 
 export default ErrorComp;
