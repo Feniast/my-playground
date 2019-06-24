@@ -81,9 +81,11 @@ class Button extends React.PureComponent {
     );
 
     let iconNode = null;
-    if (icon) {
+    if (loading) {
+      iconNode = <Icon type="loading" />;
+    } else if (icon) {
       if (typeof icon === 'string') {
-        iconNode = <Icon type={loading ? 'loading' : icon} />;
+        iconNode = <Icon type={icon} />;
       } else if (React.isValidElement(icon)) {
         iconNode = icon;
       }

@@ -34,26 +34,6 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
   border-color: $border;
 }
 
-@mixin button-disabled(
-  $color: $btn-disable-color,
-  $background: $btn-disable-bg,
-  $border: $btn-disable-border-color
-) {
-  &.disabled,
-  &[disabled] {
-    &,
-    &:hover,
-    &.hovered,
-    &:focus,
-    &.focused,
-    &:active,
-    &.active {
-      @include button-color($color, $background, $border);
-      box-shadow: none;
-    }
-  }
-}
-
 #{$btn-class} {
   position: relative;
   display: inline-block;
@@ -69,15 +49,26 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
   user-select: none;
   touch-action: manipulation;
   @include button-size($space-xxs $space-base);
-  @include button-color($btn-default-color, $btn-default-bg, $btn-default-border-color);
+  @include button-color(
+    $btn-default-color,
+    $btn-default-bg,
+    $btn-default-border-color
+  );
 
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-bg, $btn-default-bg, $btn-primary-bg);
   }
 
-  &:active, &.active {
-    @include button-color($primary-color-active, $btn-default-bg, $primary-color-active);
+  &:active,
+  &.active {
+    @include button-color(
+      $primary-color-active,
+      $btn-default-bg,
+      $primary-color-active
+    );
   }
 
   &:hover,
@@ -93,7 +84,13 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
 
   &[disabled],
   &.disabled {
+    @include button-color(
+      $btn-default-color,
+      $btn-default-bg,
+      $btn-default-border-color
+    );
     cursor: not-allowed;
+    opacity: 0.6;
 
     > * {
       pointer-events: none;
@@ -110,66 +107,101 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
 }
 
 #{$btn-class}-primary {
-  @include button-color($btn-primary-color, $btn-primary-bg);
-
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-color, $primary-color-hover);
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     @include button-color($btn-primary-color, $primary-color-active);
+  }
+
+  &,
+  &[disabled],
+  &.disabled {
+    @include button-color($btn-primary-color, $btn-primary-bg);
   }
 }
 
 #{$btn-class}-success {
-  @include button-color($btn-primary-color, $success-color);
-
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-color, $success-color-hover);
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     @include button-color($btn-primary-color, $success-color-active);
+  }
+
+  &,
+  &:disabled,
+  &[disabled] {
+    @include button-color($btn-primary-color, $success-color);
   }
 }
 
 #{$btn-class}-danger {
-  @include button-color($btn-primary-color, $error-color);
-
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-color, $error-color-hover);
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     @include button-color($btn-primary-color, $error-color-active);
+  }
+
+  &,
+  &:disabled,
+  &[disabled] {
+    @include button-color($btn-primary-color, $error-color);
   }
 }
 
 #{$btn-class}-warning {
-  @include button-color($btn-primary-color, $warning-color);
-
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-color, $warning-color-hover);
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     @include button-color($btn-primary-color, $warning-color-active);
+  }
+
+  &,
+  &:disabled,
+  &[disabled] {
+    @include button-color($btn-primary-color, $warning-color);
   }
 }
 
 #{$btn-class}-info {
-  @include button-color($btn-primary-color, $info-color);
-
-  &:hover, &.hovered,
-  &:focus, &.focused {
+  &:hover,
+  &.hovered,
+  &:focus,
+  &.focused {
     @include button-color($btn-primary-color, $info-color-hover);
   }
 
-  &:active, &.active {
+  &:active,
+  &.active {
     @include button-color($btn-primary-color, $info-color-active);
+  }
+
+  &,
+  &:disabled,
+  &[disabled] {
+    @include button-color($btn-primary-color, $info-color);
   }
 }
