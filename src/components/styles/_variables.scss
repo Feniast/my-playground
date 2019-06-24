@@ -39,18 +39,34 @@ $text-color-light: $white;
 $text-color-light-secondary: rgba($white, 0.7);
 $text-color-light-disabled: rgba($white, 0.5);
 
-$success-color: color-palette(green, 600);
+$primary-color: color-palette(blue, 600);
+$primary-color-hover: color-palette(blue, 500);
+$primary-color-active: color-palette(blue, 700);
+
+$success-color: color-palette(green, 500);
+$success-color-hover: color-palette(green, 400);
+$success-color-active: color-palette(green, 600);
 $success-color-secondary: color-palette(green, 300);
 $success-color-fade: color-palette(green, 50);
+
 $error-color: color-palette(red, 600);
+$error-color-hover: color-palette(red, 500);
+$error-color-active: color-palette(red, 700);
 $error-color-secondary: color-palette(red, 300);
 $error-color-fade: color-palette(red, 50);
+
+$warning-color: color-palette(yellow, 800);
+$warning-color-hover: lighten($warning-color, 8);
+$warning-color-active: darken($warning-color, 8);
 $warning-color: color-palette(yellow, 800);
 $warning-color-secondary: color-palette(yellow, 500);
 $warning-color-fade: color-palette(yellow, 50);
-$info-color: color-palette(blue, 600);
-$info-color-secondary: color-palette(blue, 300);
-$info-color-fade: color-palette(blue, 50);
+
+$info-color: color-palette(light-blue, 600);
+$info-color-hover: color-palette(light-blue, 500);
+$info-color-active: color-palette(light-blue, 700);
+$info-color-secondary: color-palette(light-blue, 300);
+$info-color-fade: color-palette(light-blue, 50);
 
 $loading-color: color-palette(light-blue, 400);
 
@@ -87,4 +103,17 @@ $space-xxxxl: 13.75 * $space-unit;
 $border-radius-base: 4px;
 
 // easing
+$ease-base-out: cubic-bezier(0.7, 0.3, 0.1, 1);
+$ease-base-in: cubic-bezier(0.9, 0, 0.3, 0.7);
+$ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+$ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+$ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+$ease-out-back: cubic-bezier(0.12, 0.4, 0.29, 1.46);
+$ease-in-back: cubic-bezier(0.71, -0.46, 0.88, 0.6);
+$ease-in-out-back: cubic-bezier(0.71, -0.46, 0.29, 1.46);
+$ease-out-circ: cubic-bezier(0.08, 0.82, 0.17, 1);
+$ease-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.34);
 $ease-in-out-circ: cubic-bezier(0.78, 0.14, 0.15, 0.86);
+$ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+$ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+$ease-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);

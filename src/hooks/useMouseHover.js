@@ -29,7 +29,9 @@ const useMouseHover = ref => {
     const setMousePos = e => {
       const { clientX, clientY } = e;
       const boundsRect = elem.getBoundingClientRect();
-      const { top, left, width, height } = boundsRect;
+      let { top, left, width, height } = boundsRect;
+      top = Math.round(top);
+      left = Math.round(left);
       const halfWidth = width / 2;
       const halfHeight = height / 2;
       const centerX = left + halfWidth;

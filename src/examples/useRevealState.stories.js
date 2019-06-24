@@ -2,6 +2,8 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { TweenMax, Power4 } from 'gsap';
 
+import Button from '../components/Button';
+
 import useRevealState from '../hooks/useRevealState';
 
 const randomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 80%, 50%)`;

@@ -19,11 +19,6 @@ $alert-description-font-size: $text-sm;
   color: $text-color;
   border-radius: $border-radius-base;
 
-  // &, & > * {
-  //   outline: 1px dashed red;
-
-  // }
-
   $self: #{&};
 
   &-no-icon#{$self} {

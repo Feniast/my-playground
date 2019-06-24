@@ -1,0 +1,175 @@
+@import '../styles/index.scss';
+
+$btn-class: '.#{$prefix}-btn';
+
+$btn-default-bg: $white;
+$btn-default-color: $text-color;
+$btn-default-border-color: color-palette(grey, 400);
+
+$button-default-text: $text-sm;
+
+$btn-primary-bg: $primary-color;
+$btn-primary-color: $white;
+
+$btn-default-border-radius: $border-radius-base;
+
+$btn-default-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+$btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+
+@mixin button-size(
+  $padding,
+  $line-height: $line-height-base,
+  $font-size: $button-default-text,
+  $border-radius: $btn-default-border-radius
+) {
+  padding: $padding;
+  line-height: $line-height;
+  font-size: $font-size;
+  border-radius: $border-radius;
+}
+
+@mixin button-color($color, $background, $border: $background) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+}
+
+@mixin button-disabled(
+  $color: $btn-disable-color,
+  $background: $btn-disable-bg,
+  $border: $btn-disable-border-color
+) {
+  &.disabled,
+  &[disabled] {
+    &,
+    &:hover,
+    &.hovered,
+    &:focus,
+    &.focused,
+    &:active,
+    &.active {
+      @include button-color($color, $background, $border);
+      box-shadow: none;
+    }
+  }
+}
+
+#{$btn-class} {
+  position: relative;
+  display: inline-block;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  font-weight: 400;
+  text-align: center;
+  line-height: $line-height-base;
+  background-image: none;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+  transition: all 0.3s $ease-in-out;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  @include button-size($space-xxs $space-base);
+  @include button-color($btn-default-color, $btn-default-bg, $btn-default-border-color);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-bg, $btn-default-bg, $btn-primary-bg);
+  }
+
+  &:active, &.active {
+    @include button-color($primary-color-active, $btn-default-bg, $primary-color-active);
+  }
+
+  &:hover,
+  &.hovered,
+  &:active,
+  &.active,
+  &:focus,
+  &.focused {
+    outline: 0;
+    text-decoration: none;
+    background: $btn-default-bg;
+  }
+
+  &[disabled],
+  &.disabled {
+    cursor: not-allowed;
+
+    > * {
+      pointer-events: none;
+    }
+  }
+
+  &-lg {
+    @include button-size($space-xs $space-base, $line-height-base, $text-base);
+  }
+
+  &-sm {
+    @include button-size($space-xxxs $space-xs, $line-height-base, $text-sm);
+  }
+}
+
+#{$btn-class}-primary {
+  @include button-color($btn-primary-color, $btn-primary-bg);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-color, $primary-color-hover);
+  }
+
+  &:active, &.active {
+    @include button-color($btn-primary-color, $primary-color-active);
+  }
+}
+
+#{$btn-class}-success {
+  @include button-color($btn-primary-color, $success-color);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-color, $success-color-hover);
+  }
+
+  &:active, &.active {
+    @include button-color($btn-primary-color, $success-color-active);
+  }
+}
+
+#{$btn-class}-danger {
+  @include button-color($btn-primary-color, $error-color);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-color, $error-color-hover);
+  }
+
+  &:active, &.active {
+    @include button-color($btn-primary-color, $error-color-active);
+  }
+}
+
+#{$btn-class}-warning {
+  @include button-color($btn-primary-color, $warning-color);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-color, $warning-color-hover);
+  }
+
+  &:active, &.active {
+    @include button-color($btn-primary-color, $warning-color-active);
+  }
+}
+
+#{$btn-class}-info {
+  @include button-color($btn-primary-color, $info-color);
+
+  &:hover, &.hovered,
+  &:focus, &.focused {
+    @include button-color($btn-primary-color, $info-color-hover);
+  }
+
+  &:active, &.active {
+    @include button-color($btn-primary-color, $info-color-active);
+  }
+}
