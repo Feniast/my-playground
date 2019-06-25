@@ -1,7 +1,9 @@
 @import '../styles/index.scss';
 
 $btn-class: '.#{$prefix}-btn';
+$icon-class: '.#{$prefix}-icon';
 
+$btn-border-width: 1px;
 $btn-default-bg: $white;
 $btn-default-color: $text-color;
 $btn-default-border-color: color-palette(grey, 400);
@@ -37,7 +39,7 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
 #{$btn-class} {
   position: relative;
   display: inline-block;
-  border: 1px solid transparent;
+  border: $btn-border-width solid transparent;
   white-space: nowrap;
   font-weight: 400;
   text-align: center;
@@ -104,6 +106,53 @@ $btn-primary-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
   &-sm {
     @include button-size($space-xxxs $space-xs, $line-height-base, $text-sm);
   }
+}
+
+#{$btn-class} {
+  > i, > span {
+    display: inline-block;
+    pointer-events: none;
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    display: none;
+    // overlay button border
+    top: -$btn-border-width;
+    left: -$btn-border-width;
+    right: -$btn-border-width;
+    bottom: -$btn-border-width;
+    border-radius: inherit;
+    opacity: 0.35;
+    z-index: 1;
+    background-color: $white;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  &-loading#{&} {
+    position: relative;
+    pointer-events: none;
+  }
+
+  &-loading#{&}::before {
+    display: block;
+  }
+
+  &:focus > span,
+  &:active > span {
+    position: relative;
+  }
+
+  > #{$icon-class} + span,
+  > span + #{$icon-class} {
+    margin-left: 8px;
+  }
+}
+
+#{$btn-class}-block {
+  display: block;
 }
 
 #{$btn-class}-primary {

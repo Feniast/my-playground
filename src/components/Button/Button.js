@@ -28,7 +28,6 @@ class Button extends React.PureComponent {
   };
 
   static defaultProps = {
-    type: 'secondary',
     htmlType: 'button',
     loading: false,
     prefixClass: 'mp',
@@ -90,6 +89,11 @@ class Button extends React.PureComponent {
         iconNode = icon;
       }
     }
+    
+    let childrenNode = null;
+    if (typeof children === 'string') {
+      childrenNode = <span>{children}</span>
+    }
 
     if (href) {
       return (
@@ -101,7 +105,7 @@ class Button extends React.PureComponent {
           {...rest}
         > 
           {iconNode}
-          {children}
+          {childrenNode}
         </a>
       );
     }
@@ -114,7 +118,7 @@ class Button extends React.PureComponent {
         {...rest}
       >
         {iconNode}
-        {children}
+        {childrenNode}
       </button>
     );
   }

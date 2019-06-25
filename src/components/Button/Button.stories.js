@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { storiesOf } from '@storybook/react';
 import styled from 'styled-components';
 import Button from './Button';
 
 const ButtonContainer = styled.div`
-  > button {
+  > .mp-btn {
     margin-right: 8px;
+    margin-bottom: 8px;
   }
 
   margin-bottom: 16px;
 `;
+
+const LoadingButton = (props) => {
+  const [loading, setLoading] = useState(false);
+  const onClick = () => {
+    setLoading(true);
+  }
+
+  useEffect(() => {
+    if (loading) {
+      const t = setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+      return () => {
+        clearTimeout(t);
+      }
+    }
+  }, [loading]);
+
+  return <Button {...props} loading={loading} onClick={onClick} />
+};
 
 storiesOf('Button', module)
   .add('basic', () => {
@@ -93,6 +114,58 @@ storiesOf('Button', module)
           <Button type="info" loading>
             Info
           </Button>
+        </ButtonContainer>
+        <ButtonContainer>
+          <LoadingButton>Default</LoadingButton>
+          <LoadingButton type="primary">
+            Primary
+          </LoadingButton>
+          <LoadingButton type="success">
+            Success
+          </LoadingButton>
+          <LoadingButton type="danger">
+            Danger
+          </LoadingButton>
+          <LoadingButton type="warning">
+            Warning
+          </LoadingButton>
+          <LoadingButton type="info">
+            Info
+          </LoadingButton>
+        </ButtonContainer>
+      </>
+    );
+  })
+  .add('anchor', () => {
+    return (
+      <>
+        <ButtonContainer>
+          <Button href="#">Default</Button>
+          <Button type="primary" href="/#" target="_self">
+            Primary
+          </Button>
+          <Button type="success" href="#">
+            Success
+          </Button>
+          <Button type="danger" href="#">
+            Danger
+          </Button>
+          <Button type="warning" href="#">
+            Warning
+          </Button>
+          <Button type="info" href="http://www.baidu.com" target="_blank">
+            Open new page
+          </Button>
+        </ButtonContainer>
+      </>
+    );
+  })
+  .add('icon', () => {
+    return (
+      <>
+        <ButtonContainer>
+          <Button icon="search">Search</Button>
+          <Button icon="heart" type="primary">Like</Button>
         </ButtonContainer>
       </>
     );
