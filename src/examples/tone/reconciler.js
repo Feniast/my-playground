@@ -7,86 +7,17 @@ import {
   unstable_IdlePriority as idlePriority,
   unstable_runWithPriority as run
 } from 'scheduler';
-import Tone from 'tone';
-
-const TONE_CLASS = '__toneClass';
-const INSTRUMENT = 'Instrument';
+import { capitalize } from './util';
+import { TONE_CLASS, INSTRUMENT } from './constants';
+import { getTypeDefinition, registerType as registerToneClass } from './toneType';
+import Instrument from './components/instrument';
+import { connectChild } from './components/relations';
 
 const roots = new Map();
 
-const ignoredProps = ['children', 'key', 'ref'];
-
 const emptyObject = Object.create(null);
 
-const capitalize = str => {
-  return `${str[0].toUpperCase()}${str.slice(1)}`;
-};
-
-const hasValueKey = o =>
-  o && typeof o === 'object' && o.hasOwnProperty('value');
-
-const getDeepValue = (o = {}, keys = []) =>
-  keys.reduce((v, k) => {
-    if (v) return v[k];
-    return undefined;
-  }, o);
-
 const isTrigger = (str) => ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
-
-const ToneTypeMap = {
-  [INSTRUMENT]: {
-    internal: ['Synth', 'AMSynth'],
-    custom: []
-  }
-};
-
-const getTypeDefinition = type => {
-  const keys = Object.keys(ToneTypeMap);
-  for (let k of keys) {
-    const { internal, custom } = ToneTypeMap[k];
-    if (internal.indexOf(type) >= 0)
-      return {
-        type: k,
-        constructor: Tone[type]
-      };
-    const def = custom.find(({ name }) => name === type);
-    if (def) {
-      return {
-        type: k,
-        constructor: def.constructor
-      };
-    }
-  }
-  return null;
-};
-
-export const registerType = (type, name, constructor) => {
-  if (!ToneTypeMap[type]) return;
-  ToneTypeMap[type].custom.push({
-    name,
-    constructor
-  });
-
-  return () => {
-    ToneTypeMap[type].custom = ToneTypeMap[type].custom.filter(
-      o => o.name !== name
-    );
-  };
-};
-
-const instrumentDecorator = (instance) => {
-  return instance;
-}
-
-const decorateInstance = (instance, type, props) => {
-  instance[TONE_CLASS] = type;
-  if (type === 'Instrument') {
-    // TODO: make it to master for now
-    instance.toMaster();
-    return instrumentDecorator(instance);
-  }
-  return instance;
-}
 
 const createInstance = (
   type,
@@ -97,36 +28,20 @@ const createInstance = (
 ) => {
   const name = capitalize(type);
   const typeDef = getTypeDefinition(name);
-  const { args = [], ...rest } = props;
   if (typeDef) {
     const { type: toneClass, constructor: Target } = typeDef;
-    let instance = new Target(...args);
-    Object.keys(rest).forEach(key => {
-      if (ignoredProps.includes(key)) return;
-      let root = instance;
-      let value = props[key];
-      let prop = instance[key];
-      if (key.includes('-')) {
-        const splitedKeys = key.split('-');
-        prop = getDeepValue(instance, splitedKeys);
-        if (!hasValueKey(prop)) {
-          key = splitedKeys[splitedKeys.length - 1];
-          root = getDeepValue(
-            instance,
-            splitedKeys.slice(0, splitedKeys.length - 1)
-          );
-        }
-      }
-      if (hasValueKey(prop)) {
-        prop.value = value;
-      } else if (root) {
-        root[key] = value;
-      }
-    });
+    let instance = null;
+    switch (toneClass) {
+      case INSTRUMENT:
+        instance = new Instrument(Target, props);
+        break;
+      default:
+        break;
+    }
 
-    instance = decorateInstance(instance, toneClass, props);
     return instance;
   } else if (isTrigger(type)) {
+    const { args = [] } = props;
     const instance = {
       isTrigger: true,
       execute(instrument) {
@@ -140,10 +55,10 @@ const createInstance = (
 
 const appendChild = (parent, child) => {
   if (!parent || !child) return;
-  if (parent[TONE_CLASS] === INSTRUMENT) {
-    if (child.isTrigger) {
-      child.execute(parent);
-    }
+  if (parent.appendChild) {
+    parent.appendChild(child);
+  } else {
+    connectChild(parent, child);
   }
 };
 
@@ -241,3 +156,7 @@ export function render(element, container, callback) {
   Renderer.updateContainer(element, root, null, callback);
   return Renderer.getPublicRootInstance(root);
 }
+
+export {
+  registerToneClass
+};
