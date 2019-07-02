@@ -9,3 +9,5 @@ export const INSERT_BEFORE = Symbol.for('insertBefore');
 export const INSTRUMENT = 'Instrument';
 
 export const EFFECT = 'Effect';
+
+export const EVENT = 'Event';

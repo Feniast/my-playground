@@ -9,7 +9,9 @@ import {
   REMOVE_CHILD,
   INSERT_BEFORE,
   INSTRUMENT,
-  TONE_CLASS
+  TONE_CLASS,
+  EFFECT,
+  EVENT
 } from '../constants';
 import {
   applyProps,
@@ -18,6 +20,8 @@ import {
   connectChild,
   disconnectChild
 } from './relations';
+import { isFunction } from 'util';
+import Tone from '../Tone';
 
 const isTrigger = str =>
   ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
@@ -64,9 +68,45 @@ const baseDecorator = {
   }
 };
 
-const decorate = (type, instance) => {
-  Object.assign(instance, baseDecorator);
+const effectDecorator = {
+  [APPEND_CHILD](child) {
+    child.parent = this;
+    attachChild(this, child);
+    connectChild(this, child);
+  },
+  [REMOVE_CHILD](child) {
+    child.parent = undefined;
+    detachChild(this, child);
+    disconnectChild(this, child);
+  }
 };
+
+const decorate = (type, instance) => {
+  switch (type) {
+    case INSTRUMENT:
+      Object.assign(instance, baseDecorator);
+      break;
+    case EFFECT:
+      Object.assign(instance, effectDecorator);
+      break;
+    default:
+      break;
+  }
+};
+
+const processEventInstance = (instance, props) => {
+  const { noTrigger = false } = props;
+  if (noTrigger === true) return;
+  const callback = instance.callback;
+  if (callback.__wrapped) return;
+  const wrappedCallback = (...args) => {
+    if (instance.parent && instance.parent instanceof Tone.Instrument) {
+      if (isFunction(callback)) callback(instance.parent, ...args);
+    }
+  }
+  wrappedCallback.__wrapped = true;
+  instance.callback = wrappedCallback;
+}
 
 export const createInstance = (
   type,
@@ -83,6 +123,9 @@ export const createInstance = (
     let instance = new Target(...args);
     instance[TONE_CLASS] = toneClass;
     applyProps(instance, rest);
+    if (toneClass === EVENT) {
+      processEventInstance(instance, props);
+    }
     decorate(toneClass, instance);
     return instance;
   } else if (isTrigger(type)) {

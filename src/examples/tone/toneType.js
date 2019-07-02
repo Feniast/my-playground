@@ -1,18 +1,71 @@
 import Tone from 'tone';
-import { INSTRUMENT } from './constants';
+import { INSTRUMENT, EFFECT, EVENT } from './constants';
 
 const ToneTypeMap = {
   [INSTRUMENT]: {
-    internal: ['Synth', 'AMSynth', 'DuoSynth'],
+    builtIn: [
+      'Instrument',
+      'NoiseSynth',
+      'Synth',
+      'AMSynth',
+      'DuoSynth',
+      'Sampler',
+      'FMSynth',
+      'MonoSynth',
+      'PluckSynth',
+      'MetalSynth',
+      'PolySynth',
+      'Monophonic',
+      'MembraneSynth'
+    ],
     custom: []
-  }
+  },
+  [EFFECT]: {
+    builtIn: [
+      'Chorus',
+      'AutoPanner',
+      'AutoWah',
+      'PitchShift',
+      'StereoWidener',
+      'Tremolo',
+      'Effect',
+      'PingPongDelay',
+      'MidSideEffect',
+      'Convolver',
+      'StereoFeedbackEffect',
+      'Chebyshev',
+      'StereoEffect',
+      'Vibrato',
+      'BitCrusher',
+      'StereoXFeedbackEffect',
+      'FeedbackEffect',
+      'Reverb',
+      'Distortion',
+      'JCReverb',
+      'Freeverb',
+      'AutoFilter',
+      'FeedbackDelay',
+      'Phaser'
+    ],
+    custom: []
+  },
+  [EVENT]: {
+    builtIn: [
+      'Sequence',
+      'Event',
+      'Part',
+      'Pattern',
+      'Loop'
+    ],
+    custom: []
+  } 
 };
 
 export const getTypeDefinition = type => {
   const keys = Object.keys(ToneTypeMap);
   for (let k of keys) {
-    const { internal, custom } = ToneTypeMap[k];
-    if (internal.indexOf(type) >= 0)
+    const { builtIn, custom } = ToneTypeMap[k];
+    if (builtIn.indexOf(type) >= 0)
       return {
         type: k,
         constructor: Tone[type]
