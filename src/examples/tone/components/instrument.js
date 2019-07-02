@@ -1,6 +1,7 @@
 import Tone from 'tone';
 import CompBase from './compBase';
 import { INSTRUMENT, TONE_CLASS } from '../constants';
+import { attachChild, detachChild } from './relations';
 
 export default class InstrumentNode extends CompBase {
   constructor(target, props) {
@@ -9,7 +10,7 @@ export default class InstrumentNode extends CompBase {
   }
 
   getIgnoredProps() {
-    console.log('nothing');
+    console.log('InstrumentNode ignored props');
     return ['hello'];
   }
 
@@ -18,14 +19,15 @@ export default class InstrumentNode extends CompBase {
   }
 
   appendChild(child) {
+    console.log('instrument add child');
     child.parent = this;
-    if (child.isTrigger) {
-      child.execute(this._instance);
-    }
+    attachChild(this, child);
   }
 
   removeChild(child) {
-    child.parent = null;
+    console.log('instrument remove child');
+    detachChild(this, child);
+    child.parent = undefined;
   }
 
   insertChild(child, beforeChild) {

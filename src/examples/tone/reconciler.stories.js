@@ -1,25 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { storiesOf } from '@storybook/react';
-import { render } from './reconciler';
-const root = {};
+import Tone from './Tone';
+
 const Example = () => {
-  const [x, setX] = React.useState('C4');
+  const [state, setState] = useState(false);
   const onClick = React.useCallback(() => {
-    setX('C5');
+    setState((state => !state));
   }, []);
-  useEffect(() => {
-    console.log('hello');
-    render(
-      <synth>
-        <triggerAttackRelease args={[x, '4n', '8n']} />
-      </synth>,
-      root
-    );
-  });
   return (
     <>
       <div>Hello</div>
-      <button onClick={onClick}>Click</button>
+      <button onClick={onClick}>{state ? 'Stop' : 'Play'}</button>
+      <Tone>
+        <duoSynth vibratoAmount={20}>
+          { state ? <triggerAttackRelease args={['C4', '4n']} /> : null }
+        </duoSynth>
+      </Tone>
     </>
   )
 }

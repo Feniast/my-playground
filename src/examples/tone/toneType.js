@@ -3,7 +3,7 @@ import { INSTRUMENT } from './constants';
 
 const ToneTypeMap = {
   [INSTRUMENT]: {
-    internal: ['Synth', 'AMSynth'],
+    internal: ['Synth', 'AMSynth', 'DuoSynth'],
     custom: []
   }
 };

@@ -3,7 +3,7 @@ export const capitalize = str => {
 };
 
 export const hasKey = (o, key) =>
-  o && typeof o === 'object' && o.hasOwnProperty(key);
+  o && isObject(o) && (key in o);
 
 export const getDeepValue = (o = {}, keys = []) =>
   keys.reduce((v, k) => {

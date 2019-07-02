@@ -3,64 +3,14 @@ import Reconciler from 'react-reconciler';
 import {
   unstable_scheduleCallback as scheduleDeferredCallback,
   unstable_cancelCallback as cancelDeferredCallback,
-  unstable_now as now,
-  unstable_IdlePriority as idlePriority,
-  unstable_runWithPriority as run
+  unstable_now as now
 } from 'scheduler';
-import { capitalize } from './util';
-import { TONE_CLASS, INSTRUMENT } from './constants';
-import { getTypeDefinition, registerType as registerToneClass } from './toneType';
-import Instrument from './components/instrument';
-import { connectChild } from './components/relations';
+import { createInstance, createRoot, appendChild, removeChild, insertBefore } from './components';
+import { registerToneClass } from './toneType';
 
 const roots = new Map();
 
 const emptyObject = Object.create(null);
-
-const isTrigger = (str) => ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
-
-const createInstance = (
-  type,
-  props,
-  rootContainerInstance,
-  currentHostContext,
-  workInProgress
-) => {
-  const name = capitalize(type);
-  const typeDef = getTypeDefinition(name);
-  if (typeDef) {
-    const { type: toneClass, constructor: Target } = typeDef;
-    let instance = null;
-    switch (toneClass) {
-      case INSTRUMENT:
-        instance = new Instrument(Target, props);
-        break;
-      default:
-        break;
-    }
-
-    return instance;
-  } else if (isTrigger(type)) {
-    const { args = [] } = props;
-    const instance = {
-      isTrigger: true,
-      execute(instrument) {
-        instrument[type](...args);
-      }
-    }
-    return instance;
-  }
-  return null;
-};
-
-const appendChild = (parent, child) => {
-  if (!parent || !child) return;
-  if (parent.appendChild) {
-    parent.appendChild(child);
-  } else {
-    connectChild(parent, child);
-  }
-};
 
 const hostConfig = {
   now,
@@ -82,9 +32,7 @@ const hostConfig = {
     workInProgress
   ) {},
   createInstance,
-  appendInitialChild: (parent, child) => {
-    appendChild(parent, child);
-  },
+  appendInitialChild: appendChild,
   finalizeInitialChildren: (
     instance,
     type,
@@ -92,11 +40,13 @@ const hostConfig = {
     rootContainerInstance,
     currentHostContext
   ) => {
-    return false;
+    return instance && instance.isTrigger;
   },
   prepareForCommit(rootContainerInstance) {},
   resetAfterCommit(rootContainerInstance) {},
-  commitMount: (domElement, type, newProps, fiberNode) => {},
+  commitMount: (instance, type, newProps, fiberNode) => {
+    instance.execute();
+  },
   appendChildToContainer: appendChild,
   prepareUpdate(
     instance,
@@ -122,18 +72,10 @@ const hostConfig = {
   },
   commitTextUpdate(textInstance, oldText, newText) {},
   appendChild,
-  insertBefore(parentInstance, child, beforeChild) {
-    parentInstance.insertBefore(child, beforeChild);
-  },
-  removeChild(parentInstance, child) {
-    parentInstance.removeChild(child);
-  },
-  insertInContainerBefore(container, child, beforeChild) {
-    container.insertBefore(child, beforeChild);
-  },
-  removeChildFromContainer(container, child) {
-    container.removeChild(child);
-  },
+  insertBefore,
+  removeChild: removeChild,
+  insertInContainerBefore: insertBefore,
+  removeChildFromContainer: removeChild,
   resetTextContent(domElement) {},
   shouldDeprioritizeSubtree(type, nextProps) {
     return false;
@@ -157,6 +99,12 @@ export function render(element, container, callback) {
   return Renderer.getPublicRootInstance(root);
 }
 
+export function unmountComponentAtNode(container) {
+  const root = roots.get(container);
+  if (root) Renderer.updateContainer(null, root, null, () => roots.delete(container));
+}
+
 export {
+  createRoot,
   registerToneClass
 };
