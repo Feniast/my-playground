@@ -2,6 +2,7 @@ import {
   unstable_IdlePriority as idlePriority,
   unstable_runWithPriority as run
 } from 'scheduler';
+import Tone from 'tone';
 import { capitalize } from '../util';
 import { getTypeDefinition } from '../toneType';
 import {
@@ -11,7 +12,9 @@ import {
   INSTRUMENT,
   TONE_CLASS,
   EFFECT,
-  EVENT
+  EVENT,
+  ON_UPDATE,
+  ON_RENDER
 } from '../constants';
 import {
   applyProps,
@@ -21,7 +24,6 @@ import {
   disconnectChild
 } from './relations';
 import { isFunction } from 'util';
-import Tone from '../Tone';
 
 const isTrigger = str =>
   ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
@@ -100,12 +102,17 @@ const processEventInstance = (instance, props) => {
   const callback = instance.callback;
   if (callback.__wrapped) return;
   const wrappedCallback = (...args) => {
-    if (instance.parent && instance.parent instanceof Tone.Instrument) {
+    console.log('call sequence');
+    if (instance.parent && (instance.parent instanceof Tone.Instrument)) {
       if (isFunction(callback)) callback(instance.parent, ...args);
     }
   }
   wrappedCallback.__wrapped = true;
   instance.callback = wrappedCallback;
+  instance[ON_RENDER] = () => {
+    console.log(instance, 'onRender');
+    instance.start();
+  }
 }
 
 export const createInstance = (
@@ -132,7 +139,7 @@ export const createInstance = (
     const { args = [] } = props;
     const instance = {
       isTrigger: true,
-      execute() {
+      [ON_RENDER]() {
         if (this.parent) {
           this.parent[type](...args);
         }

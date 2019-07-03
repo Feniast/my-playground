@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import Tone from 'tone';
 import { createRoot, render, unmountComponentAtNode } from './reconciler';
 
-const Tone = props => {
-  const { children } = props;
+const ToneRoot = props => {
+  const { children, start } = props;
   const root = useMemo(() => createRoot(), []);
   const state = useRef({
     root
@@ -15,6 +16,15 @@ const Tone = props => {
   });
 
   useEffect(() => {
+    if (start) {
+      console.log('start tone')
+      Tone.Transport.start();
+    } else {
+      Tone.Transport.stop();
+    }
+  }, [start]);
+
+  useEffect(() => {
     return () => {
       unmountComponentAtNode(state.current.root);
     }
@@ -23,4 +33,4 @@ const Tone = props => {
   return <div />;
 };
 
-export default Tone;
+export default ToneRoot;

@@ -7,6 +7,7 @@ import {
 } from 'scheduler';
 import { createInstance, createRoot, appendChild, removeChild, insertBefore } from './components';
 import { registerToneClass } from './toneType';
+import { ON_RENDER } from './constants';
 
 const roots = new Map();
 
@@ -40,12 +41,12 @@ const hostConfig = {
     rootContainerInstance,
     currentHostContext
   ) => {
-    return instance && instance.isTrigger;
+    return instance && instance[ON_RENDER];
   },
   prepareForCommit(rootContainerInstance) {},
   resetAfterCommit(rootContainerInstance) {},
   commitMount: (instance, type, newProps, fiberNode) => {
-    instance.execute();
+    instance[ON_RENDER]();
   },
   appendChildToContainer: appendChild,
   prepareUpdate(
