@@ -1,5 +1,5 @@
 import Tone from 'tone';
-import { INSTRUMENT, EFFECT, EVENT } from './constants';
+import { INSTRUMENT, EFFECT, EVENT, TYPE } from './constants';
 
 const ToneTypeMap = {
   [INSTRUMENT]: {
@@ -58,7 +58,18 @@ const ToneTypeMap = {
       'Loop'
     ],
     custom: []
-  } 
+  },
+  [TYPE]: {
+    builtIn: [
+      'Midi',
+      'Frequency',
+      'TimeBase',
+      'TransportTime',
+      'Ticks',
+      'Time'
+    ],
+    custom: []
+  }
 };
 
 export const getTypeDefinition = type => {

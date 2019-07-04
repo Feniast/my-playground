@@ -5,7 +5,14 @@ import {
   unstable_cancelCallback as cancelDeferredCallback,
   unstable_now as now
 } from 'scheduler';
-import { createInstance, createRoot, appendChild, removeChild, insertBefore } from './components';
+import {
+  createInstance,
+  createRoot,
+  appendChild,
+  removeChild,
+  insertBefore,
+  commitUpdate
+} from './component';
 import { registerToneClass } from './toneType';
 import { ON_RENDER } from './constants';
 
@@ -69,7 +76,16 @@ const hostConfig = {
     finishedWork
   ) {
     // TODO:
-    console.log('commit update');
+    commitUpdate(
+      instance,
+      updatePayload,
+      type,
+      oldProps,
+      newProps,
+      finishedWork
+    );
+    instance[ON_RENDER] && instance[ON_RENDER]();
+    console.log('commit update', instance);
   },
   commitTextUpdate(textInstance, oldText, newText) {},
   appendChild,
@@ -102,17 +118,15 @@ export function render(element, container, callback) {
 
 export function unmountComponentAtNode(container) {
   const root = roots.get(container);
-  if (root) Renderer.updateContainer(null, root, null, () => roots.delete(container));
+  if (root)
+    Renderer.updateContainer(null, root, null, () => roots.delete(container));
 }
 
-export {
-  createRoot,
-  registerToneClass
-};
+export { createRoot, registerToneClass };
 
 Renderer.injectIntoDevTools({
   bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
   version: '0.0.1',
   rendererPackageName: 'react-tone',
-  findHostInstanceByFiber: Renderer.findHostInstance,
+  findHostInstanceByFiber: Renderer.findHostInstance
 });

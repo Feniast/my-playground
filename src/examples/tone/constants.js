@@ -16,6 +16,8 @@ export const EFFECT = 'Effect';
 
 export const EVENT = 'Event';
 
+export const TYPE = 'Type';
+
 export const CHILDREN = Symbol.for('children');
 
 export const PARENT = Symbol.for('parent');

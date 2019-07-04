@@ -3,7 +3,7 @@ import {
   unstable_runWithPriority as run
 } from 'scheduler';
 import Tone from 'tone';
-import { capitalize } from '../util';
+import { capitalize, isArray, isObject } from '../util';
 import { getTypeDefinition } from '../toneType';
 import {
   APPEND_CHILD,
@@ -32,7 +32,7 @@ import { isFunction } from 'util';
 const isTrigger = str =>
   ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
 
-const defineInstanceNodeDecorator = (options = {}) => {
+const defineNodeDecorator = (options = {}) => {
   const {
     appendChildOps = [],
     removeChildOps = [],
@@ -50,7 +50,6 @@ const defineInstanceNodeDecorator = (options = {}) => {
           child[CHILDREN].forEach(c => removeChild(child, c));
         }
         if (child.dispose) {
-          console.log('dispose', child);
           child.dispose();
         }
         delete child[CHILDREN];
@@ -84,7 +83,7 @@ export const insertBefore = (parent, child, before) => {
   parent[INSERT_BEFORE](child, before);
 };
 
-const defineRoot = defineInstanceNodeDecorator({
+const defineRoot = defineNodeDecorator({
   appendChildOps: [linkChild, connectChild],
   removeChildOps: [unlinkChild, disconnectChild]
 });
@@ -93,12 +92,12 @@ export const createRoot = () => {
   return defineRoot({});
 };
 
-const decorateInstrument = defineInstanceNodeDecorator({
+const decorateInstrument = defineNodeDecorator({
   appendChildOps: [linkChild, attachChild],
   removeChildOps: [unlinkChild, detachChild]
 });
 
-const decorateEffect = defineInstanceNodeDecorator({
+const decorateEffect = defineNodeDecorator({
   appendChildOps: [linkChild, attachChild, connectChild],
   removeChildOps: [unlinkChild, detachChild, disconnectChild]
 });
@@ -119,7 +118,8 @@ const decorate = (type, instance) => {
 const CREATE_INSTANCE_HOOKS = {
   [INSTRUMENT]: {},
   [EVENT]: {
-    afterApplyProps: (instance, type, props) => {
+    ignoredProps: ['start', 'stop', 'wrapCallback'],
+    afterApplyProps: (instance, type, props, oldProps) => {
       const { wrapCallback = true } = props;
       if (wrapCallback === false) return;
       const callback = instance.callback;
@@ -132,7 +132,20 @@ const CREATE_INSTANCE_HOOKS = {
       wrappedCallback.__wrapped = true;
       instance.callback = wrappedCallback;
       instance[ON_RENDER] = () => {
-        instance.start();
+        const state = instance.state;
+        if (state === 'started') {
+          if (!props.start) {
+            instance.stop();
+          }
+        } else {
+          if (props.start) {
+            if (isArray(props.start)) {
+              instance.start(...props.start);
+            } else {
+              instance.start();
+            }
+          }
+        }
       };
     }
   }
@@ -154,11 +167,11 @@ export const createInstance = (
     const hookObj = CREATE_INSTANCE_HOOKS[toneClass] || {};
     instance[TONE_CLASS] = toneClass;
     if (isFunction(hookObj.beforeApplyProps)) {
-      hookObj.beforeApplyProps(instance, type, props);
+      hookObj.beforeApplyProps(instance, type, props, {});
     }
-    applyProps(instance, rest);
+    applyProps(instance, rest, {}, hookObj.ignoredProps);
     if (isFunction(hookObj.afterApplyProps)) {
-      hookObj.afterApplyProps(instance, type, props);
+      hookObj.afterApplyProps(instance, type, props, {});
     }
     decorate(toneClass, instance);
     return instance;
@@ -175,4 +188,61 @@ export const createInstance = (
     return instance;
   }
   return null;
+};
+
+const switchInstance = (instance, type, newProps, fiber) => {
+  const parent = instance.parent;
+  const newInstance = createInstance(type, newProps);
+  removeChild(parent, instance);
+  appendChild(parent, newInstance);
+
+  // This evil hack switches the react-internal fiber node
+  // https://github.com/facebook/react/issues/14983
+  // https://github.com/facebook/react/pull/15021
+  [fiber, fiber.alternate].forEach(fiber => {
+    if (fiber !== null) {
+      fiber.stateNode = newInstance;
+      if (fiber.ref) {
+        if (typeof fiber.ref === 'function') fiber.ref(newInstance);
+        else fiber.ref.current = newInstance;
+      }
+    }
+  });
+};
+
+const updateProps = (instance, type, oldProps, newProps) => {
+  const toneClass = instance[TONE_CLASS];
+  const hookObj = CREATE_INSTANCE_HOOKS[toneClass] || {};
+  if (isFunction(hookObj.beforeApplyProps)) {
+    hookObj.beforeApplyProps(instance, type, newProps, oldProps);
+  }
+  applyProps(instance, newProps, oldProps, hookObj.ignoredProps);
+  if (isFunction(hookObj.afterApplyProps)) {
+    hookObj.afterApplyProps(instance, type, newProps, oldProps);
+  }
+};
+
+export const commitUpdate = (
+  instance,
+  updatePayload,
+  type,
+  oldProps,
+  newProps,
+  fiber
+) => {
+  const { args: argsNew = [], ...restNew } = newProps;
+  const { args: argsOld = [], ...restOld } = oldProps;
+  // If it has new props or arguments, then it needs to be re-instanciated
+  const hasNewArgs = argsNew.some((value, index) =>
+    isObject(value)
+      ? Object.entries(value).some(([key, val]) => val !== argsOld[index][key])
+      : value !== argsOld[index]
+  );
+  if (hasNewArgs || !instance[TONE_CLASS]) {
+    // Next we create a new instance and append it again
+    switchInstance(instance, type, newProps, fiber);
+  } else {
+    // Otherwise just overwrite props
+    updateProps(instance, type, restNew, restOld);
+  }
 };

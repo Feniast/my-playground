@@ -14,7 +14,6 @@ const Tune = props => {
 
   useEffect(() => {
     if (start) {
-      console.log('start tone');
       Tone.Transport.start();
     } else {
       Tone.Transport.stop();
