@@ -74,7 +74,7 @@ const hostConfig = {
   commitTextUpdate(textInstance, oldText, newText) {},
   appendChild,
   insertBefore,
-  removeChild: removeChild,
+  removeChild,
   insertInContainerBefore: insertBefore,
   removeChildFromContainer: removeChild,
   resetTextContent(domElement) {},
@@ -109,3 +109,10 @@ export {
   createRoot,
   registerToneClass
 };
+
+Renderer.injectIntoDevTools({
+  bundleType: process.env.NODE_ENV === 'production' ? 0 : 1,
+  version: '0.0.1',
+  rendererPackageName: 'react-tone',
+  findHostInstanceByFiber: Renderer.findHostInstance,
+});

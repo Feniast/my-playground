@@ -14,34 +14,59 @@ import {
   EFFECT,
   EVENT,
   ON_UPDATE,
-  ON_RENDER
+  ON_RENDER,
+  PARENT,
+  CHILDREN
 } from '../constants';
 import {
   applyProps,
   attachChild,
   detachChild,
   connectChild,
-  disconnectChild
-} from './relations';
+  disconnectChild,
+  linkChild,
+  unlinkChild
+} from './host';
 import { isFunction } from 'util';
 
 const isTrigger = str =>
   ['triggerAttack', 'triggerRelease', 'triggerAttackRelease'].includes(str);
 
-class Root {
-  [APPEND_CHILD](child) {
-    child.parent = this;
-    connectChild(null, child);
-  }
-
-  [REMOVE_CHILD](child) {
-    child.parent = undefined;
-    disconnectChild(null, child);
-  }
-}
-
-export const createRoot = () => {
-  return new Root();
+const defineInstanceNodeDecorator = (options = {}) => {
+  const {
+    appendChildOps = [],
+    removeChildOps = [],
+    insertAsAppend = true,
+    insertBeforeOps = []
+  } = options;
+  const decorator = {
+    [APPEND_CHILD](child) {
+      appendChildOps.forEach(fn => fn(this, child));
+    },
+    [REMOVE_CHILD](child) {
+      removeChildOps.forEach(fn => fn(this, child));
+      run(idlePriority, () => {
+        if (child[CHILDREN]) {
+          child[CHILDREN].forEach(c => removeChild(child, c));
+        }
+        if (child.dispose) {
+          console.log('dispose', child);
+          child.dispose();
+        }
+        delete child[CHILDREN];
+      });
+    },
+    [INSERT_BEFORE]: insertAsAppend
+      ? function(child) {
+          this[APPEND_CHILD](child);
+        }
+      : function(child, before) {
+          insertBeforeOps.forEach(fn => fn(child, before));
+        }
+  };
+  return instance => {
+    return Object.assign(instance, decorator);
+  };
 };
 
 export const appendChild = (parent, child) => {
@@ -59,61 +84,59 @@ export const insertBefore = (parent, child, before) => {
   parent[INSERT_BEFORE](child, before);
 };
 
-const baseDecorator = {
-  [APPEND_CHILD](child) {
-    child.parent = this;
-    attachChild(this, child);
-  },
-  [REMOVE_CHILD](child) {
-    child.parent = undefined;
-    detachChild(this, child);
-  }
+const defineRoot = defineInstanceNodeDecorator({
+  appendChildOps: [linkChild, connectChild],
+  removeChildOps: [unlinkChild, disconnectChild]
+});
+
+export const createRoot = () => {
+  return defineRoot({});
 };
 
-const effectDecorator = {
-  [APPEND_CHILD](child) {
-    child.parent = this;
-    attachChild(this, child);
-    connectChild(this, child);
-  },
-  [REMOVE_CHILD](child) {
-    child.parent = undefined;
-    detachChild(this, child);
-    disconnectChild(this, child);
-  }
-};
+const decorateInstrument = defineInstanceNodeDecorator({
+  appendChildOps: [linkChild, attachChild],
+  removeChildOps: [unlinkChild, detachChild]
+});
+
+const decorateEffect = defineInstanceNodeDecorator({
+  appendChildOps: [linkChild, attachChild, connectChild],
+  removeChildOps: [unlinkChild, detachChild, disconnectChild]
+});
 
 const decorate = (type, instance) => {
   switch (type) {
     case INSTRUMENT:
-      Object.assign(instance, baseDecorator);
+      decorateInstrument(instance);
       break;
     case EFFECT:
-      Object.assign(instance, effectDecorator);
+      decorateEffect(instance);
       break;
     default:
       break;
   }
 };
 
-const processEventInstance = (instance, props) => {
-  const { noTrigger = false } = props;
-  if (noTrigger === true) return;
-  const callback = instance.callback;
-  if (callback.__wrapped) return;
-  const wrappedCallback = (...args) => {
-    console.log('call sequence');
-    if (instance.parent && (instance.parent instanceof Tone.Instrument)) {
-      if (isFunction(callback)) callback(instance.parent, ...args);
+const CREATE_INSTANCE_HOOKS = {
+  [INSTRUMENT]: {},
+  [EVENT]: {
+    afterApplyProps: (instance, type, props) => {
+      const { wrapCallback = true } = props;
+      if (wrapCallback === false) return;
+      const callback = instance.callback;
+      if (callback.__wrapped) return;
+      const wrappedCallback = (...args) => {
+        if (instance[PARENT] && instance[PARENT] instanceof Tone.Instrument) {
+          if (isFunction(callback)) callback(instance[PARENT], ...args);
+        }
+      };
+      wrappedCallback.__wrapped = true;
+      instance.callback = wrappedCallback;
+      instance[ON_RENDER] = () => {
+        instance.start();
+      };
     }
   }
-  wrappedCallback.__wrapped = true;
-  instance.callback = wrappedCallback;
-  instance[ON_RENDER] = () => {
-    console.log(instance, 'onRender');
-    instance.start();
-  }
-}
+};
 
 export const createInstance = (
   type,
@@ -128,10 +151,14 @@ export const createInstance = (
     const { type: toneClass, constructor: Target } = typeDef;
     const { args = [], ...rest } = props;
     let instance = new Target(...args);
+    const hookObj = CREATE_INSTANCE_HOOKS[toneClass] || {};
     instance[TONE_CLASS] = toneClass;
+    if (isFunction(hookObj.beforeApplyProps)) {
+      hookObj.beforeApplyProps(instance, type, props);
+    }
     applyProps(instance, rest);
-    if (toneClass === EVENT) {
-      processEventInstance(instance, props);
+    if (isFunction(hookObj.afterApplyProps)) {
+      hookObj.afterApplyProps(instance, type, props);
     }
     decorate(toneClass, instance);
     return instance;
@@ -140,8 +167,8 @@ export const createInstance = (
     const instance = {
       isTrigger: true,
       [ON_RENDER]() {
-        if (this.parent) {
-          this.parent[type](...args);
+        if (this[PARENT]) {
+          this[PARENT][type](...args);
         }
       }
     };

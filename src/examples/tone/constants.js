@@ -15,3 +15,7 @@ export const INSTRUMENT = 'Instrument';
 export const EFFECT = 'Effect';
 
 export const EVENT = 'Event';
+
+export const CHILDREN = Symbol.for('children');
+
+export const PARENT = Symbol.for('parent');

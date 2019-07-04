@@ -9,6 +9,7 @@ import {
   getDeepValue,
   hasKey
 } from '../util';
+import { CHILDREN, PARENT } from '../constants';
 
 const DefaultIgnoredProps = ['children', 'key', 'ref'];
 
@@ -104,4 +105,19 @@ export const disconnectChild = (parent, child) => {
   if (child instanceof Tone.AudioNode) {
     child.disconnect();
   }
+};
+
+export const linkChild = (parent, child) => {
+  if (!parent || !child) return;
+  if (!parent[CHILDREN]) {
+    parent[CHILDREN] = [];
+  }
+  parent[CHILDREN].push(child);
+  child[PARENT] = parent;
+};
+
+export const unlinkChild = (parent, child) => {
+  if (!parent || !child) return;
+  parent[CHILDREN] = parent[CHILDREN].filter(c => c !== child);
+  child[PARENT] = undefined;
 };
