@@ -191,7 +191,7 @@ export const createInstance = (
 };
 
 const switchInstance = (instance, type, newProps, fiber) => {
-  const parent = instance.parent;
+  const parent = instance[PARENT];
   const newInstance = createInstance(type, newProps);
   removeChild(parent, instance);
   appendChild(parent, newInstance);

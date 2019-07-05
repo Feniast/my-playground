@@ -75,7 +75,6 @@ const hostConfig = {
     newProps,
     finishedWork
   ) {
-    // TODO:
     commitUpdate(
       instance,
       updatePayload,
@@ -84,7 +83,8 @@ const hostConfig = {
       newProps,
       finishedWork
     );
-    instance[ON_RENDER] && instance[ON_RENDER]();
+    const newInstance = finishedWork.stateNode;
+    newInstance[ON_RENDER] && newInstance[ON_RENDER]();
     console.log('commit update', instance);
   },
   commitTextUpdate(textInstance, oldText, newText) {},

@@ -17,7 +17,7 @@ const Example = () => {
   }, []);
   useEffect(() => {
     setInterval(() => {
-      console.log(seq.current._events);
+      seq.current && console.log(seq.current._events);
     }, 1000);
   }, []);
   const [pitch, setPitch] = useState('1');
