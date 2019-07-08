@@ -121,3 +121,14 @@ export const unlinkChild = (parent, child) => {
   parent[CHILDREN] = parent[CHILDREN].filter(c => c !== child);
   child[PARENT] = undefined;
 };
+
+export const updateToneEvents = (instance, newEvents = [], oldEvents = []) => {
+  newEvents.forEach((e, idx) => {
+    instance.at(idx, e);
+  });
+  if (oldEvents.length > newEvents.length) {
+    for (let i = newEvents.length; i < oldEvents.length; i++) {
+      instance.remove(i);
+    }
+  }
+};

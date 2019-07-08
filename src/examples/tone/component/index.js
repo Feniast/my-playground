@@ -25,7 +25,8 @@ import {
   connectChild,
   disconnectChild,
   linkChild,
-  unlinkChild
+  unlinkChild,
+  updateToneEvents
 } from './host';
 import { isFunction } from 'util';
 
@@ -232,17 +233,40 @@ export const commitUpdate = (
 ) => {
   const { args: argsNew = [], ...restNew } = newProps;
   const { args: argsOld = [], ...restOld } = oldProps;
-  // If it has new props or arguments, then it needs to be re-instanciated
-  const hasNewArgs = argsNew.some((value, index) =>
-    isObject(value)
-      ? Object.entries(value).some(([key, val]) => val !== argsOld[index][key])
-      : value !== argsOld[index]
-  );
-  if (hasNewArgs || !instance[TONE_CLASS]) {
-    // Next we create a new instance and append it again
-    switchInstance(instance, type, newProps, fiber);
-  } else {
-    // Otherwise just overwrite props
+  // There are some special case for tone sequence and part
+  if (instance instanceof Tone.Sequence) {
+    // check whether subdivision is equal, if not, create a new instance
+    if (argsNew[2] !== argsOld[2]) {
+      switchInstance(instance, type, newProps, fiber);
+    } else {
+      if (argsNew[0] !== argsOld[0]) {
+        console.log('update callback');
+        instance.callback = argsNew[0];
+      }
+      updateToneEvents(instance, argsNew[1], argsOld[1]);
+      updateProps(instance, type, restNew, restOld);
+    }
+  } else if (instance instanceof Tone.Part) {
+    if (argsNew[0] !== argsOld[0]) {
+      console.log('update callback');
+      instance.callback = argsNew[0];
+    }
+    updateToneEvents(instance, argsNew[1], argsOld[1]);
     updateProps(instance, type, restNew, restOld);
+  } else {  // If it has new props or arguments, then it needs to be re-instanciated
+    const hasNewArgs = argsNew.some((value, index) =>
+      isObject(value)
+        ? Object.entries(value).some(
+            ([key, val]) => val !== argsOld[index][key]
+          )
+        : value !== argsOld[index]
+    );
+    if (hasNewArgs || !instance[TONE_CLASS]) {
+      // Next we create a new instance and append it again
+      switchInstance(instance, type, newProps, fiber);
+    } else {
+      // Otherwise just overwrite props
+      updateProps(instance, type, restNew, restOld);
+    }
   }
 };

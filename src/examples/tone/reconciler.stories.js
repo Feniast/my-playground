@@ -40,11 +40,11 @@ const Example = () => {
             <feedbackDelay delay="4n" feedback={0.2}>
               <synth ref={synth}>
                 {/* {state ? <triggerAttackRelease args={['C4', '4n']} /> : null} */}
-                <sequence
+                {/* <sequence
                   ref={seq}
-                  args={[trigger, ['C2', 'C3', 'C4', x], '4n']}
+                  args={[trigger, ['D5', 'C3', 'C4', x], '4n']}
                   start
-                />
+                /> */}
                 {/* <part
                   args={[
                     trigger,
