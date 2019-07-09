@@ -122,7 +122,7 @@ export const unlinkChild = (parent, child) => {
   child[PARENT] = undefined;
 };
 
-export const updateToneEvents = (instance, newEvents = [], oldEvents = []) => {
+export const updateToneSequence = (instance, newEvents = [], oldEvents = []) => {
   newEvents.forEach((e, idx) => {
     instance.at(idx, e);
   });
@@ -131,4 +131,18 @@ export const updateToneEvents = (instance, newEvents = [], oldEvents = []) => {
       instance.remove(i);
     }
   }
+};
+
+export const updateToneParts = (instance, newParts = [], oldParts = []) => {
+  if (oldParts === newParts) return;
+  if (oldParts.length > 0) {
+    instance.removeAll();
+  }
+  newParts.forEach(p => {
+    if (isObject(p)) {
+      instance.at(p.time, p);
+    } else {
+      instance.at(p[0], p[1]);
+    }
+  });
 };

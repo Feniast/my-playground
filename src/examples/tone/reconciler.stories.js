@@ -2,26 +2,114 @@ import React, { useRef, useEffect, useState } from 'react';
 import { storiesOf } from '@storybook/react';
 import Tone from 'tone';
 import Tune from './Tune';
+import { getMusicParts } from './helpers';
+
+const rhythms = [
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '4n',
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '4n',
+  '8n',
+  '4n',
+  '8n',
+  '8n',
+  '8n',
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '4n',
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '4n',
+  '8n',
+  '4n',
+  '8n',
+  '8n',
+  '8n',
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '4n',
+  '8n',
+  '8n',
+  '8n',
+  ['r', '8n'],
+  '4n',
+  '4n',
+  '4n',
+  '8n',
+  ['r', '8n'],
+  '8n',
+  '8n',
+  '8n',
+  '8n',
+  '8n',
+  '8n',
+  '8n'
+];
+const notes = [
+  'D5',
+  'F5#',
+  'G5',
+  'C5',
+  'G4',
+  'B4',
+  'C5',
+  'D5',
+  'G4',
+  'C5',
+  'B4',
+  'D5',
+  'F5#',
+  'G5',
+  'C5',
+  'G4',
+  'B4',
+  'C5',
+  'D5',
+  'G4',
+  'C5',
+  'B4',
+  null,
+  'D5',
+  'F5#',
+  'G5',
+  'G5',
+  ['C5', 'A5'],
+  'B5',
+  'A5',
+  'C6',
+  'B5',
+  'G5',
+  null,
+  'B4',
+  'G4',
+  'G5',
+  'F5#',
+  'G4',
+  'G5',
+  'D5'
+];
+
+const parts = getMusicParts({
+  notes,
+  rhythms,
+  startTime: 0
+});
 
 const Example = () => {
   const [state, setState] = useState(false);
   const synth = useRef();
-  const seq = useRef();
+  const part = useRef();
   const onClick = React.useCallback(() => {
     setState(state => !state);
   }, []);
-  const trigger = React.useCallback((inst, time, note) => {
-    console.log(note);
-    // console.log(Tone.Transport.position);
-    inst.triggerAttackRelease(note, '8n', time);
-  }, []);
-  useEffect(() => {
-    setInterval(() => {
-      seq.current && console.log(seq.current._events);
-    }, 1000);
-  }, []);
   const [pitch, setPitch] = useState('1');
-  const x = ['C', 'D', 'E', 'F', 'G', 'A', 'B'][pitch - 1] + '5';
   return (
     <>
       <div>Hello</div>
@@ -35,27 +123,19 @@ const Example = () => {
         value={pitch}
       />
       <Tune start={state}>
-        {state ? (
-          <distortion distortion={1}>
-            <feedbackDelay delay="4n" feedback={0.2}>
-              <synth ref={synth}>
-                {/* {state ? <triggerAttackRelease args={['C4', '4n']} /> : null} */}
-                {/* <sequence
-                  ref={seq}
-                  args={[trigger, ['D5', 'C3', 'C4', x], '4n']}
-                  start
-                /> */}
-                {/* <part
-                  args={[
-                    trigger,
-                    [[0, 'C5'], ['0:2', 'D5'], ['0:3:2', 'E5']]
-                  ]}
-                  start
-                /> */}
-              </synth>
-            </feedbackDelay>
-          </distortion>
-        ) : null}
+        <aMSynth ref={synth}>
+          {/* {state ? <triggerAttackRelease args={['C4', '4n']} /> : null} */}
+          <part
+            ref={part}
+            args={[
+              (inst, time, obj) => {
+                inst.triggerAttackRelease(obj.note, obj.duration, time);
+              },
+              parts
+            ]}
+            start
+          />
+        </aMSynth>
         {/* <membraneSynth>
           <part
             args={[trigger, [[0, 'C2'], ['0:2', 'C2'], ['0:3:2', 'C2']]]}

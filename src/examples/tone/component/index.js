@@ -26,7 +26,8 @@ import {
   disconnectChild,
   linkChild,
   unlinkChild,
-  updateToneEvents
+  updateToneSequence,
+  updateToneParts
 } from './host';
 import { isFunction } from 'util';
 
@@ -243,7 +244,7 @@ export const commitUpdate = (
         console.log('update callback');
         instance.callback = argsNew[0];
       }
-      updateToneEvents(instance, argsNew[1], argsOld[1]);
+      updateToneSequence(instance, argsNew[1], argsOld[1]);
       updateProps(instance, type, restNew, restOld);
     }
   } else if (instance instanceof Tone.Part) {
@@ -251,7 +252,7 @@ export const commitUpdate = (
       console.log('update callback');
       instance.callback = argsNew[0];
     }
-    updateToneEvents(instance, argsNew[1], argsOld[1]);
+    updateToneParts(instance, argsNew[1], argsOld[1]);
     updateProps(instance, type, restNew, restOld);
   } else {  // If it has new props or arguments, then it needs to be re-instanciated
     const hasNewArgs = argsNew.some((value, index) =>
