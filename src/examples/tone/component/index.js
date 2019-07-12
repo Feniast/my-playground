@@ -3,7 +3,7 @@ import {
   unstable_runWithPriority as run
 } from 'scheduler';
 import Tone from 'tone';
-import { capitalize, isArray, isObject } from '../util';
+import { capitalize, isArray, isObject, noop, type, equal } from '../util';
 import { getTypeDefinition } from '../toneType';
 import {
   APPEND_CHILD,
@@ -72,17 +72,17 @@ const defineNodeDecorator = (options = {}) => {
 
 export const appendChild = (parent, child) => {
   if (!parent || !child) return;
-  parent[APPEND_CHILD](child);
+  parent[APPEND_CHILD] && parent[APPEND_CHILD](child);
 };
 
 export const removeChild = (parent, child) => {
   if (!parent || !child) return;
-  parent[REMOVE_CHILD](child);
+  parent[REMOVE_CHILD] && parent[REMOVE_CHILD](child);
 };
 
 export const insertBefore = (parent, child, before) => {
   if (!parent || !child) return;
-  parent[INSERT_BEFORE](child, before);
+  parent[INSERT_BEFORE] && parent[INSERT_BEFORE](child, before);
 };
 
 const defineRoot = defineNodeDecorator({
@@ -117,7 +117,7 @@ const decorate = (type, instance) => {
   }
 };
 
-const CREATE_INSTANCE_HOOKS = {
+const MutationHooks = {
   [INSTRUMENT]: {},
   [EVENT]: {
     ignoredProps: ['start', 'stop', 'wrapCallback'],
@@ -153,6 +153,79 @@ const CREATE_INSTANCE_HOOKS = {
   }
 };
 
+const mergeHooks = (
+  target = {},
+  src,
+  def = {}
+) => {
+  if (!src) return target;
+  const allKeys = Object.keys(target).concat(Object.keys(src));
+  return allKeys.reduce((acc, k) => {
+    if (!(k in target)) {
+      acc[k] = src[k];
+      return acc;
+    }
+    const behavior = def[k] || 'merge';
+    const canMerge = [isArray, isObject, isFunction].some(p => p(target[k]));
+    if (
+      type(target[k]) !== type(src[k]) ||
+      behavior === 'override' ||
+      !canMerge
+    ) {
+      acc[k] = target[k];
+    } else if (behavior === 'merge' || behavior === 'mergeAfter') {
+      if (isArray(target[k])) {
+        acc[k] = src[k].concat(target[k]);
+      } else if (isObject(target[k])) {
+        acc[k] = { ...src[k], ...target[k] };
+      } else if (isFunction(target[k])) {
+        acc[k] = function(...args) {
+          src[k](...args);
+          target[k](...args);
+        };
+      }
+    } else if (behavior === 'mergeBefore') {
+      if (isArray(target[k])) {
+        acc[k] = target[k].concat(src[k]);
+      } else if (isObject(target[k])) {
+        acc[k] = { ...target[k], ...src[k] };
+      } else if (isFunction(target[k])) {
+        acc[k] = function(...args) {
+          target[k](...args);
+          src[k](...args);
+        };
+      }
+    } else {
+      acc[k] = target[k];
+    }
+    return acc;
+  }, {});
+};
+
+const registerMutationHook = (name, hook, parentName, mergeOptions) => {
+  MutationHooks[name] = mergeHooks(hook, MutationHooks[parentName], mergeOptions);
+  return () => {
+    delete MutationHooks[name];
+  };
+};
+
+const getMutationHook = (...names) => {
+  for (let i=0; i<names.length; i++) {
+    if (MutationHooks[names[i]]) return MutationHooks[names[i]];
+  }
+  return {};
+};
+
+registerMutationHook('PolySynth', {
+  ignoredProps: ['set'],
+  afterApplyProps(instance, type, props, oldProps) {
+    if (!equal(props.set, oldProps.set)) {
+      const args = isArray(props.set) ? props.set : [props.set];
+      instance.set(...args);
+    }
+  }
+});
+
 export const createInstance = (
   type,
   props,
@@ -166,7 +239,7 @@ export const createInstance = (
     const { type: toneClass, constructor: Target } = typeDef;
     const { args = [], ...rest } = props;
     let instance = new Target(...args);
-    const hookObj = CREATE_INSTANCE_HOOKS[toneClass] || {};
+    const hookObj = getMutationHook(name, toneClass);
     instance[TONE_CLASS] = toneClass;
     if (isFunction(hookObj.beforeApplyProps)) {
       hookObj.beforeApplyProps(instance, type, props, {});
@@ -214,7 +287,7 @@ const switchInstance = (instance, type, newProps, fiber) => {
 
 const updateProps = (instance, type, oldProps, newProps) => {
   const toneClass = instance[TONE_CLASS];
-  const hookObj = CREATE_INSTANCE_HOOKS[toneClass] || {};
+  const hookObj = getMutationHook(capitalize(type), toneClass);
   if (isFunction(hookObj.beforeApplyProps)) {
     hookObj.beforeApplyProps(instance, type, newProps, oldProps);
   }
@@ -254,7 +327,8 @@ export const commitUpdate = (
     }
     updateToneParts(instance, argsNew[1], argsOld[1]);
     updateProps(instance, type, restNew, restOld);
-  } else {  // If it has new props or arguments, then it needs to be re-instanciated
+  } else {
+    // If it has new props or arguments, then it needs to be re-instanciated
     const hasNewArgs = argsNew.some((value, index) =>
       isObject(value)
         ? Object.entries(value).some(

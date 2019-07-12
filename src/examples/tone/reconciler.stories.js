@@ -123,7 +123,15 @@ const Example = () => {
         value={pitch}
       />
       <Tune start={state}>
-        <aMSynth ref={synth}>
+        <polySynth
+          args={[2, Tone.Synth]}
+          set={{
+            envelope: {
+              attack: 0.15
+            }
+          }}
+          ref={synth}
+        >
           {/* {state ? <triggerAttackRelease args={['C4', '4n']} /> : null} */}
           <part
             ref={part}
@@ -135,13 +143,13 @@ const Example = () => {
             ]}
             start
           />
-        </aMSynth>
-        {/* <membraneSynth>
-          <part
-            args={[trigger, [[0, 'C2'], ['0:2', 'C2'], ['0:3:2', 'C2']]]}
-            start
+        </polySynth>
+        <membraneSynth>
+          <sequence
+            args={[(inst, time, note) => {inst.triggerAttackRelease(note, '8n', time)}, ['C2'], '4n']}
+            start={['0:0:2']}
           />
-        </membraneSynth> */}
+        </membraneSynth>
       </Tune>
     </>
   );
