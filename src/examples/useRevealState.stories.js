@@ -1,7 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { TweenMax, Power4 } from 'gsap';
-
 import useRevealState from '../hooks/useRevealState';
 
 const randomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 80%, 50%)`;
@@ -22,7 +21,7 @@ const RevealedComponent = props => {
     });
   }, []);
   React.useEffect(() => {
-    if (scrollState.visible) {
+    if (scrollState.visible && !scrollState.prevVisible) {
       TweenMax.to(textRef.current, 1, {
         opacity: 1,
         y: '0%',

@@ -104,7 +104,7 @@ class ScrollHub {
     elements.forEach((element, idx) => {
       const { onScroll, state = {} } = element;
       const newState = revealStates[idx];
-      newState.prevVisible = typeof state.visible === 'undefined' ? newState.visible : state.visible;
+      newState.prevVisible = !!state.visible; // make it false when state.visible is not set initially in order to trigger some action
       element.state = newState;
       onScroll(newState);
     });
