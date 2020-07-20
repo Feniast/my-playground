@@ -7,7 +7,7 @@
     "constate": "^1.1.1",
     "customize-cra": "^0.2.13",
     "gsap": "^2.1.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "react": "^16.8.6",
     "react-app-rewired": "^2.1.3",
     "react-dom": "^16.8.6",
